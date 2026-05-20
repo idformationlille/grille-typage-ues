@@ -736,9 +736,13 @@
       </div>
     </div>
 
-    <button class="copy-btn" id="copy-btn" onclick="copyFiche()">
+    <button class="copy-btn" id="copy-btn" onclick="copyFiche()" style="display:none">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       Copier la fiche pour le logiciel métier
+    </button>
+
+    <button class="btn-pri" id="back-btn" onclick="goBackTo(3)" style="display:none;width:100%;margin-bottom:.75rem">
+      ← Revenir compléter l'analyse du marché
     </button>
 
     <button class="restart-btn" onclick="restart()">
@@ -800,13 +804,14 @@
     document.getElementById('prog-pct').textContent = 'Terminé';
 
     let typeLabel = '', emoji = '', colorClass = '', sitTxt = '', actTxt = '';
+    let isIncomplete = false;
 
     if (freinBloquant) {
       emoji = '🔴'; typeLabel = 'Non sortable'; colorClass = 'c-red';
       sitTxt = 'Un frein périphérique bloquant est présent et non résolu. La recherche active d\'emploi ne peut pas être engagée dans ces conditions.';
       actTxt = 'Orienter vers le partenaire compétent (service social, SIAE, mission locale, CPAM...). Réévaluer le positionnement à J+21 une fois le frein traité.';
     } else if (marcheChecked < 2) {
-      emoji = '⚠️'; typeLabel = 'Typage incomplet'; colorClass = 'c-amber';
+      emoji = '⚠️'; typeLabel = 'Typage incomplet'; colorClass = 'c-amber'; isIncomplete = true;
       sitTxt = 'L\'analyse du marché n\'a pas été complétée. Le positionnement ne peut pas être validé sans cette étape indispensable.';
       actTxt = 'Vérifier les offres actives sur France Travail pour le secteur et le département concernés, compléter l\'étape 4, puis recalculer.';
     } else if (raw >= 10) {
@@ -874,6 +879,24 @@
     txt += '\nRévisions obligatoires : J+21 / J+45 / J+75';
     window._fiche = txt;
 
+    // Afficher ou masquer les boutons selon le cas
+    document.getElementById('copy-btn').style.display = isIncomplete ? 'none' : 'flex';
+    document.getElementById('back-btn').style.display = isIncomplete ? 'block' : 'none';
+    document.querySelector('.recap-card').style.display = isIncomplete ? 'none' : 'block';
+    document.querySelector('.revision-block').style.display = isIncomplete ? 'none' : 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goBackTo(n) {
+    document.getElementById('result-wrap').classList.remove('on');
+    document.getElementById('main-card').style.display = 'block';
+    cur = n;
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('on'));
+    document.getElementById('step-' + n).classList.add('on');
+    document.getElementById('prog-label').textContent = labels[n];
+    document.getElementById('prog-pct').textContent = 'Étape ' + (n + 1) + ' / 5';
+    document.getElementById('prog-fill').style.width = (n / 4 * 100) + '%';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
