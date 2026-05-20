@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Positionnement emploi — Prestation Un Emploi Stable</title>
+  <title>Placement Emploi — Typage profil bénéficiaires</title>
   <meta name="description" content="Outil de typage des bénéficiaires UES — ID Formation">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -143,6 +143,7 @@
       transition: border-color .2s;
     }
     .id-field:focus { border-color: var(--blue-text); background: var(--bg); }
+    select.id-field { cursor: pointer; appearance: auto; }
     .id-field::placeholder { color: var(--text3); font-size: 13px; }
 
     /* Cartes critères */
@@ -392,8 +393,8 @@
 
   <header class="app-header">
     <div class="logo">ID Formation</div>
-    <h1>Positionnement emploi</h1>
-    <p>Prestation Un Emploi Stable — Grille de typage consultant</p>
+    <h1>Placement Emploi</h1>
+    <p>Typage profil bénéficiaires</p>
   </header>
 
   <div class="card" id="main-card">
@@ -429,7 +430,13 @@
           <input class="id-field" id="f-consultant" placeholder="Nom du consultant" maxlength="60">
         </div>
         <div class="id-row">
-          <input class="id-field" id="f-typage" placeholder="Type de typage : initial / J+21 / J+45 / J+75" maxlength="30">
+          <select class="id-field" id="f-typage">
+            <option value="" disabled selected>Type de typage</option>
+            <option value="Initial">Initial</option>
+            <option value="30 jours">30 jours</option>
+            <option value="45 jours">45 jours</option>
+            <option value="90 jours">90 jours</option>
+          </select>
         </div>
       </div>
 
@@ -683,7 +690,7 @@
             <div class="note-header-sub">Nature du frein identifié et actions envisagées</div>
           </div>
         </div>
-        <textarea class="note-field" id="note-freins" maxlength="400" placeholder="Ex : Absence de solution de garde pour deux enfants en bas âge. Orientation vers la CAF et la mairie pour place en crèche d'urgence. Réévaluation prévue à J+21." oninput="cc('note-freins','cnt-freins')"></textarea>
+        <textarea class="note-field" id="note-freins" maxlength="400" placeholder="Ex : Absence de solution de garde pour deux enfants en bas âge. Orientation vers la CAF et la mairie pour place en crèche d'urgence. Réévaluation prévue à 30 jours." oninput="cc('note-freins','cnt-freins')"></textarea>
         <div class="note-footer">
           <span class="note-footer-lbl">Consultant uniquement</span>
           <span class="char-count" id="cnt-freins">0 / 400</span>
@@ -730,9 +737,9 @@
     <div class="revision-block">
       <div class="revision-title">Révisions obligatoires du typage</div>
       <div class="chips">
-        <div class="chip">📅 J+21 — semaine 3</div>
-        <div class="chip">📅 J+45 — semaine 6</div>
-        <div class="chip">📅 J+75 — semaine 10</div>
+        <div class="chip">📅 30 jours</div>
+        <div class="chip">📅 45 jours</div>
+        <div class="chip">📅 90 jours</div>
       </div>
     </div>
 
@@ -741,8 +748,17 @@
       Copier la fiche pour le logiciel métier
     </button>
 
+    <button class="copy-btn" id="pdf-btn" onclick="imprimerFiche()" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Imprimer / Enregistrer en PDF
+    </button>
+
     <button class="btn-pri" id="back-btn" onclick="goBackTo(3)" style="display:none;width:100%;margin-bottom:.75rem">
       ← Revenir compléter l'analyse du marché
+    </button>
+
+    <button class="restart-btn" id="modify-btn" onclick="goBackTo(4)" style="margin-bottom:.75rem">
+      &larr; &nbsp;Modifier le typage
     </button>
 
     <button class="restart-btn" onclick="restart()">
@@ -751,8 +767,8 @@
   </div>
 
   <footer class="app-footer">
-    ID Formation · Prestation Un Emploi Stable<br>
-    Outil interne — usage consultant uniquement
+    ID Formation · Typage profil bénéficiaires<br>
+    Typage profil bénéficiaires — usage consultant uniquement
   </footer>
 
 </div>
@@ -809,7 +825,7 @@
     if (freinBloquant) {
       emoji = '🔴'; typeLabel = 'Non sortable'; colorClass = 'c-red';
       sitTxt = 'Un frein périphérique bloquant est présent et non résolu. La recherche active d\'emploi ne peut pas être engagée dans ces conditions.';
-      actTxt = 'Orienter vers le partenaire compétent (service social, SIAE, mission locale, CPAM...). Réévaluer le positionnement à J+21 une fois le frein traité.';
+      actTxt = 'Orienter vers le partenaire compétent (service social, SIAE, mission locale, CPAM...). Réévaluer le positionnement à 30 jours une fois le frein traité.';
     } else if (marcheChecked < 2) {
       emoji = '⚠️'; typeLabel = 'Typage incomplet'; colorClass = 'c-amber'; isIncomplete = true;
       sitTxt = 'L\'analyse du marché n\'a pas été complétée. Le positionnement ne peut pas être validé sans cette étape indispensable.';
@@ -825,7 +841,7 @@
     } else {
       emoji = '🔴'; typeLabel = 'Non sortable'; colorClass = 'c-red';
       sitTxt = 'Le profil ne réunit pas les conditions suffisantes pour un placement dans le cadre de la prestation. Engager des candidatures dans ces conditions conduirait à des résultats prévisiblement négatifs.';
-      actTxt = 'Travailler le projet professionnel, envisager une réorientation vers un secteur plus accessible ou mobiliser les partenaires compétents. Réévaluer le positionnement à J+21.';
+      actTxt = 'Travailler le projet professionnel, envisager une réorientation vers un secteur plus accessible ou mobiliser les partenaires compétents. Réévaluer le positionnement à 30 jours.';
     }
 
     const boxClass = colorClass === 'c-green' ? 'box-green' : colorClass === 'c-red' ? 'box-red' : 'box-amber';
@@ -862,30 +878,118 @@
     });
     document.getElementById('rc-notes-wrap').innerHTML = notesHtml;
 
-    // Stocker pour copie
-    let txt = '=== FICHE DE TYPAGE UES — ID FORMATION ===\n';
-    txt += 'Date : ' + dateStr + '\n';
-    txt += 'Bénéficiaire : ' + ((prenom + ' ' + nom).trim() || '—') + '\n';
-    txt += 'Département : ' + (dept || '—') + '\n';
-    txt += 'Secteur visé : ' + (secteur || '—') + '\n';
-    txt += 'Consultant : ' + (consultant || '—') + '\n';
-    txt += 'Type de typage : ' + (typageType || '—') + '\n';
-    txt += 'Positionnement : ' + typeLabel + '\n';
-    txt += 'Score : ' + raw + ' / 14\n';
+    // Stocker pour copie — format propre logiciel métier
+    const benef = ((prenom + ' ' + nom).trim() || '—');
+    let txt = 'FICHE DE TYPAGE UES\n';
+    txt += 'ID Formation — Typage profil bénéficiaires\n';
+    txt += '_'.repeat(40) + '\n\n';
+    txt += 'Date              : ' + dateStr + '\n';
+    txt += 'Bénéficiaire      : ' + benef + '\n';
+    txt += 'Département       : ' + (dept || '—') + '\n';
+    txt += 'Secteur visé      : ' + (secteur || '—') + '\n';
+    txt += 'Consultant        : ' + (consultant || '—') + '\n';
+    txt += 'Type de typage    : ' + (typageType || '—') + '\n';
+    txt += '_'.repeat(40) + '\n\n';
+    txt += 'POSITIONNEMENT    : ' + typeLabel.toUpperCase() + '\n';
+    txt += 'Score             : ' + raw + ' / 14\n';
+    txt += '_'.repeat(40) + '\n';
     notesData.forEach(n => {
       const val = document.getElementById(n.id).value.trim();
-      if (val) txt += '\n--- ' + n.label + ' ---\n' + val + '\n';
+      if (val) txt += '\n' + n.label.toUpperCase() + '\n' + val + '\n';
     });
-    txt += '\nRévisions obligatoires : J+21 / J+45 / J+75';
+    txt += '\n' + '_'.repeat(40) + '\n';
+    txt += 'Révisions : 30 jours  /  45 jours  /  90 jours';
     window._fiche = txt;
 
     // Afficher ou masquer les boutons selon le cas
     document.getElementById('copy-btn').style.display = isIncomplete ? 'none' : 'flex';
+    document.getElementById('pdf-btn').style.display = isIncomplete ? 'none' : 'flex';
     document.getElementById('back-btn').style.display = isIncomplete ? 'block' : 'none';
+    document.getElementById('modify-btn').style.display = isIncomplete ? 'none' : 'block';
     document.querySelector('.recap-card').style.display = isIncomplete ? 'none' : 'block';
     document.querySelector('.revision-block').style.display = isIncomplete ? 'none' : 'block';
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function imprimerFiche() {
+    const benef = document.getElementById('rc-benef').textContent;
+    const dept = document.getElementById('rc-dept').textContent;
+    const secteur = document.getElementById('rc-secteur').textContent;
+    const consultant = document.getElementById('rc-consultant').textContent;
+    const typageType = document.getElementById('rc-typage').textContent;
+    const result = document.getElementById('rc-result').textContent;
+    const score = document.getElementById('rc-score').textContent;
+    const date = document.getElementById('recap-date').textContent;
+    const sitTxt = document.getElementById('res-sit').querySelector('p').textContent;
+    const actTxt = document.getElementById('res-act').querySelector('p').textContent;
+
+    const notesData = [
+      { id: 'note-projet', label: 'Projet professionnel' },
+      { id: 'note-comp', label: 'Compétences et disponibilité' },
+      { id: 'note-marche', label: 'Analyse du marché' },
+      { id: 'note-freins', label: 'Freins et plan de levée' }
+    ];
+    let notesHtml = '';
+    notesData.forEach(n => {
+      const val = document.getElementById(n.id).value.trim();
+      if (val) notesHtml += `<div class="ns"><div class="nl">${n.label}</div><div class="nv">${val.replace(/\n/g,'<br>')}</div></div>`;
+    });
+
+    const couleur = result.includes('100%') ? '#3b6d11' : result.includes('50%') ? '#854f0b' : '#a32d2d';
+    const fond = result.includes('100%') ? '#eaf3de' : result.includes('50%') ? '#faeeda' : '#fcebeb';
+
+    const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+    <title>Fiche typage — ${benef}</title>
+    <style>
+      body { font-family: Arial, sans-serif; font-size: 13px; color: #1a1a18; margin: 0; padding: 2cm; }
+      .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #185fa5; padding-bottom: 12px; margin-bottom: 20px; }
+      .org { font-size: 11px; font-weight: 700; color: #185fa5; letter-spacing: .06em; text-transform: uppercase; }
+      .doc-title { font-size: 18px; font-weight: 700; color: #1a1a18; margin: 4px 0 2px; }
+      .doc-sub { font-size: 12px; color: #5f5e5a; }
+      .date { font-size: 11px; color: #9c9a92; text-align: right; }
+      .result-badge { display: inline-block; background: ${fond}; color: ${couleur}; border: 1px solid ${couleur}; border-radius: 6px; padding: 6px 16px; font-size: 15px; font-weight: 700; margin: 16px 0 12px; }
+      table.info { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+      table.info td { padding: 5px 8px; font-size: 12px; border-bottom: 1px solid #eeedea; }
+      table.info td:first-child { color: #5f5e5a; width: 38%; }
+      table.info td:last-child { font-weight: 600; }
+      .section { margin-bottom: 14px; }
+      .section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #9c9a92; margin-bottom: 5px; }
+      .section-body { font-size: 13px; color: #1a1a18; line-height: 1.6; background: #f5f4f0; border-radius: 6px; padding: 10px 12px; }
+      .ns { margin-bottom: 12px; }
+      .nl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #9c9a92; margin-bottom: 4px; }
+      .nv { font-size: 13px; color: #1a1a18; line-height: 1.6; background: #f5f4f0; border-radius: 6px; padding: 10px 12px; }
+      .revisions { margin-top: 20px; padding-top: 12px; border-top: 1px solid #eeedea; font-size: 11px; color: #9c9a92; }
+      .revisions span { display: inline-block; background: #eeedea; border-radius: 12px; padding: 3px 10px; margin-right: 6px; }
+      @media print { body { padding: 1.5cm; } }
+    </style></head><body>
+    <div class="header">
+      <div>
+        <div class="org">ID Formation</div>
+        <div class="doc-title">Fiche de typage UES</div>
+        <div class="doc-sub">Typage profil bénéficiaires</div>
+      </div>
+      <div class="date">Date : ${date}</div>
+    </div>
+    <div class="result-badge">${result}</div>
+    <table class="info">
+      <tr><td>Bénéficiaire</td><td>${benef}</td></tr>
+      <tr><td>Département</td><td>${dept}</td></tr>
+      <tr><td>Secteur visé</td><td>${secteur}</td></tr>
+      <tr><td>Consultant</td><td>${consultant}</td></tr>
+      <tr><td>Type de typage</td><td>${typageType}</td></tr>
+      <tr><td>Score</td><td>${score}</td></tr>
+    </table>
+    <div class="section"><div class="section-title">Situation</div><div class="section-body">${sitTxt}</div></div>
+    <div class="section"><div class="section-title">Plan d'action</div><div class="section-body">${actTxt}</div></div>
+    ${notesHtml}
+    <div class="revisions">Révisions obligatoires : <span>30 jours</span><span>45 jours</span><span>90 jours</span></div>
+    <script>window.onload = function(){ window.print(); }<\/script>
+    </body></html>`;
+
+    const w = window.open('', '_blank');
+    w.document.write(html);
+    w.document.close();
   }
 
   function goBackTo(n) {
@@ -918,7 +1022,8 @@
     document.querySelectorAll('.qcard').forEach(c => c.classList.remove('checked'));
     document.querySelectorAll('textarea').forEach(t => t.value = '');
     document.querySelectorAll('.char-count').forEach(c => c.textContent = '0 / 400');
-    ['f-nom','f-prenom','f-dept','f-secteur','f-consultant','f-typage'].forEach(id => document.getElementById(id).value = '');
+    ['f-nom','f-prenom','f-dept','f-secteur','f-consultant'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-typage').selectedIndex = 0;
     document.getElementById('result-wrap').classList.remove('on');
     document.getElementById('main-card').style.display = 'block';
     window._fiche = null;
