@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Positionnement emploi — Prestation Un Emploi Stable</title>
+  <meta name="description" content="Outil de typage des bénéficiaires UES — ID Formation">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #f5f4f0;
+      --bg3: #eeedea;
+      --text: #1a1a18;
+      --text2: #5f5e5a;
+      --text3: #9c9a92;
+      --border: rgba(0,0,0,0.12);
+      --border2: rgba(0,0,0,0.20);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --blue-bg: #e6f1fb;
+      --blue-text: #185fa5;
+      --blue-border: rgba(24,95,165,0.3);
+      --green-bg: #eaf3de;
+      --green-text: #3b6d11;
+      --green-border: rgba(59,109,17,0.3);
+      --amber-bg: #faeeda;
+      --amber-text: #854f0b;
+      --amber-border: rgba(133,79,11,0.3);
+      --red-bg: #fcebeb;
+      --red-text: #a32d2d;
+      --red-border: rgba(163,45,45,0.3);
+      --info-bg: #e6f1fb;
+      --info-text: #185fa5;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1e1e1c;
+        --bg2: #2a2a28;
+        --bg3: #333330;
+        --text: #e8e6de;
+        --text2: #b4b2a9;
+        --text3: #73716a;
+        --border: rgba(255,255,255,0.1);
+        --border2: rgba(255,255,255,0.18);
+        --blue-bg: #0c2d4a;
+        --blue-text: #85b7eb;
+        --blue-border: rgba(133,183,235,0.25);
+        --green-bg: #173404;
+        --green-text: #c0dd97;
+        --green-border: rgba(192,221,151,0.25);
+        --amber-bg: #412402;
+        --amber-text: #fac775;
+        --amber-border: rgba(250,199,117,0.25);
+        --red-bg: #501313;
+        --red-text: #f09595;
+        --red-border: rgba(240,149,149,0.25);
+        --info-bg: #0c2d4a;
+        --info-text: #85b7eb;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg2);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    .shell {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* En-tête */
+    .app-header {
+      text-align: center;
+      margin-bottom: 1.75rem;
+      padding: 1.25rem 1rem;
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+    }
+    .app-header .logo {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--blue-text);
+      margin-bottom: .35rem;
+    }
+    .app-header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: .25rem;
+    }
+    .app-header p {
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    /* Carte principale */
+    .card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    /* Progression */
+    .prog-wrap { padding: 1rem 1.25rem .75rem; border-bottom: 0.5px solid var(--border); }
+    .prog-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+    .prog-track { height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 3px; background: var(--blue-text); transition: width .4s; }
+
+    /* Steps */
+    .step { display: none; padding: 1.25rem; }
+    .step.on { display: block; }
+    .step-num { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .step-title { font-size: 17px; font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 6px; }
+    .step-desc { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 1.1rem; }
+
+    /* Champs identité */
+    .id-section { margin-bottom: 1rem; }
+    .id-section-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .5rem; }
+    .id-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .id-row:last-child { margin-bottom: 0; }
+    .id-field {
+      flex: 1;
+      background: var(--bg2);
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius-md);
+      padding: .65rem .85rem;
+      font-size: 14px;
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .id-field:focus { border-color: var(--blue-text); background: var(--bg); }
+    .id-field::placeholder { color: var(--text3); font-size: 13px; }
+
+    /* Cartes critères */
+    .qcard {
+      background: var(--bg);
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius-lg);
+      margin-bottom: .7rem;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      user-select: none;
+    }
+    .qcard:last-of-type { margin-bottom: 0; }
+    .qcard.checked { border-color: var(--blue-text); background: var(--blue-bg); }
+    .qcard.frein.checked { border-color: var(--red-text); background: var(--red-bg); }
+
+    .qlabel { display: flex; align-items: flex-start; gap: 12px; padding: .9rem 1rem; }
+    .qcheck {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      border: 1.5px solid var(--border2);
+      background: var(--bg2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: all .2s;
+    }
+    .qcard.checked .qcheck { background: var(--blue-text); border-color: var(--blue-text); }
+    .qcard.frein.checked .qcheck { background: var(--red-text); border-color: var(--red-text); }
+    .qcheck svg { display: none; }
+    .qcard.checked .qcheck svg { display: block; }
+
+    .qtxt { flex: 1; }
+    .qmain { font-size: 14px; color: var(--text); line-height: 1.55; }
+    .qcard.checked .qmain { color: var(--blue-text); }
+    .qcard.frein.checked .qmain { color: var(--red-text); }
+    .qnote { font-size: 12px; color: var(--text3); margin-top: 3px; line-height: 1.45; }
+    .qcard.checked .qnote { color: var(--blue-text); opacity: .75; }
+    .qcard.frein.checked .qnote { color: var(--red-text); opacity: .75; }
+
+    /* Badge marché */
+    .mbadge {
+      display: inline-flex; align-items: center;
+      background: var(--amber-bg); color: var(--amber-text);
+      border-radius: 4px; font-size: 10px; font-weight: 600;
+      padding: 1px 6px; margin-left: 6px; vertical-align: middle;
+    }
+
+    /* Séparateur section */
+    .qs-sep {
+      font-size: 11px; font-weight: 600; color: var(--text3);
+      text-transform: uppercase; letter-spacing: .05em;
+      padding: .75rem 0 .4rem;
+      margin-top: .25rem;
+    }
+
+    /* Note consultant */
+    .note-bloc {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+    .note-header {
+      padding: .65rem 1rem;
+      border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .note-icon {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--bg3);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .note-header-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .note-header-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+    textarea.note-field {
+      width: 100%; border: none; background: transparent;
+      font-family: inherit; font-size: 13px; color: var(--text);
+      line-height: 1.65; padding: .85rem 1rem;
+      resize: none; outline: none; min-height: 80px;
+    }
+    textarea.note-field::placeholder { color: var(--text3); }
+    .note-footer {
+      padding: .4rem 1rem;
+      border-top: 0.5px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .note-footer-lbl { font-size: 11px; color: var(--text3); }
+    .char-count { font-size: 11px; color: var(--text3); }
+
+    /* Alerte consultant (marché) */
+    .consultant-alert {
+      background: var(--amber-bg);
+      border: 0.5px solid var(--amber-border);
+      border-radius: var(--radius-md);
+      padding: .7rem .9rem;
+      font-size: 13px; color: var(--amber-text);
+      line-height: 1.55; margin-bottom: 1rem;
+    }
+
+    /* Navigation */
+    .nav-row { display: flex; gap: 10px; margin-top: 1.25rem; }
+    .btn-sec {
+      flex: 1; padding: 11px;
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius-md);
+      font-size: 14px; color: var(--text2);
+      background: var(--bg); cursor: pointer; font-family: inherit;
+      transition: background .15s;
+    }
+    .btn-sec:hover { background: var(--bg2); }
+    .btn-pri {
+      flex: 2; padding: 11px; border: none;
+      border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 600; color: #fff;
+      background: var(--blue-text); cursor: pointer; font-family: inherit;
+      transition: opacity .15s;
+    }
+    .btn-pri:hover { opacity: .88; }
+
+    /* Résultat */
+    .result-wrap { display: none; }
+    .result-wrap.on { display: block; }
+
+    .result-card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .result-top {
+      padding: 1.5rem 1.25rem 1.1rem;
+      text-align: center;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .result-emoji { font-size: 42px; margin-bottom: .65rem; }
+    .result-type { font-size: 22px; font-weight: 700; margin-bottom: .3rem; }
+    .result-score { font-size: 12px; color: var(--text2); }
+
+    .rbox { padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--border); }
+    .rbox:last-child { border-bottom: none; }
+    .rlbl {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .05em; margin-bottom: .4rem;
+    }
+    .rbox p { font-size: 14px; line-height: 1.65; }
+
+    /* Fiche récap */
+    .recap-card {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden; margin-bottom: 1rem;
+    }
+    .recap-header {
+      padding: .75rem 1.25rem;
+      background: var(--bg2);
+      border-bottom: 0.5px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .recap-header-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .recap-date { font-size: 11px; color: var(--text3); }
+    .recap-body { padding: .5rem 0; }
+    .recap-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: .5rem 1.25rem;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 13px;
+    }
+    .recap-row:last-child { border-bottom: none; }
+    .recap-key { color: var(--text2); flex-shrink: 0; margin-right: 1rem; }
+    .recap-val { color: var(--text); font-weight: 600; text-align: right; }
+
+    .notes-section { padding: .75rem 1.25rem; border-top: 0.5px solid var(--border); }
+    .notes-section-label {
+      font-size: 11px; font-weight: 600; color: var(--text3);
+      text-transform: uppercase; letter-spacing: .05em; margin-bottom: .4rem;
+    }
+    .notes-section-content {
+      font-size: 13px; color: var(--text);
+      line-height: 1.65; white-space: pre-wrap;
+      background: var(--bg2);
+      border-radius: var(--radius-md);
+      padding: .65rem .85rem;
+    }
+
+    /* Révisions */
+    .revision-block { margin-bottom: 1rem; }
+    .revision-title { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: .5rem; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      padding: 5px 12px; border-radius: 20px; font-size: 12px;
+      background: var(--bg); color: var(--text2);
+      border: 0.5px solid var(--border2);
+    }
+
+    /* Boutons résultat */
+    .copy-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px; border: 0.5px solid var(--border2);
+      border-radius: var(--radius-md);
+      font-size: 14px; color: var(--text2);
+      background: var(--bg); cursor: pointer; font-family: inherit;
+      margin-bottom: .75rem; transition: all .2s;
+    }
+    .copy-btn:hover { background: var(--bg2); }
+    .copy-btn.copied { color: var(--green-text); border-color: var(--green-border); }
+    .restart-btn {
+      width: 100%; padding: 11px;
+      border: 0.5px solid var(--border2);
+      border-radius: var(--radius-md);
+      font-size: 14px; color: var(--text2);
+      background: var(--bg); cursor: pointer; font-family: inherit;
+      transition: background .15s;
+    }
+    .restart-btn:hover { background: var(--bg2); }
+
+    /* Footer */
+    .app-footer {
+      text-align: center; margin-top: 1.5rem;
+      font-size: 11px; color: var(--text3);
+      line-height: 1.6;
+    }
+
+    /* Couleurs résultat */
+    .c-green { color: var(--green-text); }
+    .c-amber { color: var(--amber-text); }
+    .c-red { color: var(--red-text); }
+    .c-blue { color: var(--blue-text); }
+
+    .box-green { background: var(--green-bg); border-top: 0.5px solid var(--green-border); }
+    .box-green .rlbl { color: var(--green-text); }
+    .box-green p { color: var(--green-text); }
+    .box-amber { background: var(--amber-bg); border-top: 0.5px solid var(--amber-border); }
+    .box-amber .rlbl { color: var(--amber-text); }
+    .box-amber p { color: var(--amber-text); }
+    .box-red { background: var(--red-bg); border-top: 0.5px solid var(--red-border); }
+    .box-red .rlbl { color: var(--red-text); }
+    .box-red p { color: var(--red-text); }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="app-header">
+    <div class="logo">ID Formation</div>
+    <h1>Positionnement emploi</h1>
+    <p>Prestation Un Emploi Stable — Grille de typage consultant</p>
+  </header>
+
+  <div class="card" id="main-card">
+    <div class="prog-wrap">
+      <div class="prog-meta">
+        <span id="prog-label">Identification du dossier</span>
+        <span id="prog-pct">Étape 1 / 5</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+
+    <!-- ÉTAPE 0 : IDENTIFICATION -->
+    <div class="step on" id="step-0">
+      <div class="step-num">Étape 1</div>
+      <div class="step-title">Identification du dossier</div>
+      <div class="step-desc">Ces informations permettent de tracer le typage et de suivre son évolution dans le temps.</div>
+
+      <div class="id-section">
+        <div class="id-section-label">Bénéficiaire</div>
+        <div class="id-row">
+          <input class="id-field" id="f-nom" placeholder="Nom" maxlength="50">
+          <input class="id-field" id="f-prenom" placeholder="Prénom" maxlength="50">
+        </div>
+        <div class="id-row">
+          <input class="id-field" id="f-dept" placeholder="Département (ex : 93)" maxlength="3" style="max-width:140px">
+          <input class="id-field" id="f-secteur" placeholder="Secteur professionnel visé" maxlength="60">
+        </div>
+      </div>
+
+      <div class="id-section" style="margin-top:1rem">
+        <div class="id-section-label">Consultant</div>
+        <div class="id-row">
+          <input class="id-field" id="f-consultant" placeholder="Nom du consultant" maxlength="60">
+        </div>
+        <div class="id-row">
+          <input class="id-field" id="f-typage" placeholder="Type de typage : initial / J+21 / J+45 / J+75" maxlength="30">
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-pri" onclick="goTo(1)">Étape suivante →</button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 1 : PROJET -->
+    <div class="step" id="step-1">
+      <div class="step-num">Étape 2</div>
+      <div class="step-title">Projet professionnel</div>
+      <div class="step-desc">Le projet est-il défini et réaliste ? Cochez les éléments vérifiés en séance.</div>
+
+      <div class="qcard" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="2">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Le projet professionnel est défini — secteur et type de poste clairement identifiés</div>
+            <div class="qnote">Projet stable, cohérent, pas plusieurs orientations simultanées sans lien entre elles</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qcard" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="2">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Les attentes salariales sont cohérentes avec les fourchettes réelles du marché local</div>
+            <div class="qnote">Vérifiable sur France Travail ou les grilles conventionnelles du secteur visé</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-bloc">
+        <div class="note-header">
+          <div class="note-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2)"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div>
+            <div class="note-header-title">Note consultant — Projet</div>
+            <div class="note-header-sub">Observations sur le projet professionnel</div>
+          </div>
+        </div>
+        <textarea class="note-field" id="note-projet" maxlength="400" placeholder="Ex : Projet de reconversion vers la logistique, ancienne assistante administrative. Secteur cohérent avec le bassin 94. Salaire visé 1 800 € brut — cohérent avec les offres du secteur." oninput="cc('note-projet','cnt-projet')"></textarea>
+        <div class="note-footer">
+          <span class="note-footer-lbl">Consultant uniquement</span>
+          <span class="char-count" id="cnt-projet">0 / 400</span>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-sec" onclick="goTo(0)">← Retour</button>
+        <button class="btn-pri" onclick="goTo(2)">Étape suivante →</button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 2 : COMPÉTENCES -->
+    <div class="step" id="step-2">
+      <div class="step-num">Étape 3</div>
+      <div class="step-title">Compétences et disponibilité</div>
+      <div class="step-desc">Le bénéficiaire est-il en capacité de postuler ? Cochez les éléments vérifiés en séance.</div>
+
+      <div class="qcard" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="2">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Le CV est à jour et reflète fidèlement les compétences et expériences réelles</div>
+            <div class="qnote">Les missions concrètement exercées sont visibles, pas uniquement les diplômes obtenus</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qcard" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="1">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Le bénéficiaire est en mesure de présenter son parcours de façon structurée en entretien</div>
+            <div class="qnote">Testé en séance : capacité à répondre à une question d'entretien standard sur son parcours</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qcard" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="2">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Disponible pour une prise de poste immédiate ou dans les deux semaines</div>
+            <div class="qnote">Aucune formation longue, procédure en cours ou engagement incompatible avec une embauche</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qcard" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="1">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">La zone de mobilité géographique est compatible avec les offres disponibles dans le secteur visé</div>
+            <div class="qnote">Transports disponibles, permis de conduire, contraintes de déplacement identifiées et levées</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-bloc">
+        <div class="note-header">
+          <div class="note-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2)"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div>
+            <div class="note-header-title">Note consultant — Compétences</div>
+            <div class="note-header-sub">Observations sur le profil et la disponibilité</div>
+          </div>
+        </div>
+        <textarea class="note-field" id="note-comp" maxlength="400" placeholder="Ex : CV revu en séance, valorisation des compétences terrain à renforcer. Pitch hésitant — simulation d'entretien à prévoir semaine 2. Mobilité : zone 94 uniquement, pas de permis." oninput="cc('note-comp','cnt-comp')"></textarea>
+        <div class="note-footer">
+          <span class="note-footer-lbl">Consultant uniquement</span>
+          <span class="char-count" id="cnt-comp">0 / 400</span>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-sec" onclick="goTo(1)">← Retour</button>
+        <button class="btn-pri" onclick="goTo(3)">Étape suivante →</button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 3 : MARCHÉ -->
+    <div class="step" id="step-3">
+      <div class="step-num">Étape 4</div>
+      <div class="step-title">Analyse du marché du travail</div>
+      <div class="consultant-alert">⚠️ Cette étape est renseignée par le consultant après vérification sur France Travail — avant de valider le typage.</div>
+
+      <div class="qcard" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="3" data-marche="1">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Des offres actives existent dans le secteur visé sur le département ou le département limitrophe <span class="mbadge">marché</span></div>
+            <div class="qnote">Minimum 5 offres publiées sur France Travail dans les 30 derniers jours sur la zone</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qcard" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="2" data-marche="1">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Le secteur visé n'est pas en situation de saturation sur cette zone <span class="mbadge">marché</span></div>
+            <div class="qnote">Secteurs saturés en IDF : comptabilité junior, ressources humaines, communication, droit</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qcard" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="1" data-marche="1">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Des employeurs locaux identifiés recrutent régulièrement sur ce type de profil <span class="mbadge">marché</span></div>
+            <div class="qnote">Ex : logistique en 77 et 94, aide à domicile en 93, hôtellerie et sécurité en 75, aéronautique en 91</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-bloc">
+        <div class="note-header">
+          <div class="note-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2)"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div>
+            <div class="note-header-title">Note consultant — Marché</div>
+            <div class="note-header-sub">Sources consultées et observations marché</div>
+          </div>
+        </div>
+        <textarea class="note-field" id="note-marche" maxlength="400" placeholder="Ex : Vérifié sur France Travail le 15/05 — 12 offres agent logistique sur le 94 dans les 30 derniers jours. Secteur porteur. Employeurs identifiés : Kuehne+Nagel Rungis, ID Logistics Vitry." oninput="cc('note-marche','cnt-marche')"></textarea>
+        <div class="note-footer">
+          <span class="note-footer-lbl">Consultant uniquement</span>
+          <span class="char-count" id="cnt-marche">0 / 400</span>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-sec" onclick="goTo(2)">← Retour</button>
+        <button class="btn-pri" onclick="goTo(4)">Étape suivante →</button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 4 : FREINS -->
+    <div class="step" id="step-4">
+      <div class="step-num">Étape 5</div>
+      <div class="step-title">Freins à l'emploi</div>
+      <div class="step-desc">Cochez les freins identifiés en séance. Leur identification permet d'orienter vers les solutions adaptées.</div>
+
+      <div class="qcard frein" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="-3" data-frein="1">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Frein périphérique bloquant présent et non résolu</div>
+            <div class="qnote">Absence de solution de garde d'enfant, de moyen de transport, situation administrative à régulariser, problème de santé non pris en charge</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qcard frein" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="-2" data-frein="1">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Inhibition ou anxiété forte face à l'entretien de recrutement — obstacle significatif observé en séance</div>
+            <div class="qnote">Difficulté à maintenir le contact, à parler de son parcours, évitement des situations de communication</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qcard frein" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="-1" data-frein="1">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Niveau de français écrit insuffisant pour rédiger des candidatures autonomes dans le secteur visé</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qcard frein" onclick="toggle(this)">
+        <input type="checkbox" style="display:none" data-pts="-1" data-frein="1">
+        <div class="qlabel">
+          <div class="qcheck"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="qtxt">
+            <div class="qmain">Conditions d'emploi acceptées trop restrictives au regard des offres disponibles</div>
+            <div class="qnote">Refus du CDD, du temps partiel ou d'horaires décalés alors que les offres du secteur sont majoritairement sur ces formats</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-bloc">
+        <div class="note-header">
+          <div class="note-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2)"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div>
+            <div class="note-header-title">Note consultant — Freins et plan de levée</div>
+            <div class="note-header-sub">Nature du frein identifié et actions envisagées</div>
+          </div>
+        </div>
+        <textarea class="note-field" id="note-freins" maxlength="400" placeholder="Ex : Absence de solution de garde pour deux enfants en bas âge. Orientation vers la CAF et la mairie pour place en crèche d'urgence. Réévaluation prévue à J+21." oninput="cc('note-freins','cnt-freins')"></textarea>
+        <div class="note-footer">
+          <span class="note-footer-lbl">Consultant uniquement</span>
+          <span class="char-count" id="cnt-freins">0 / 400</span>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-sec" onclick="goTo(3)">← Retour</button>
+        <button class="btn-pri" onclick="showResult()">Calculer le positionnement →</button>
+      </div>
+    </div>
+  </div><!-- fin main-card -->
+
+  <!-- RÉSULTAT -->
+  <div class="result-wrap" id="result-wrap">
+
+    <div class="result-card">
+      <div class="result-top">
+        <div class="result-emoji" id="res-emoji"></div>
+        <div class="result-type" id="res-type"></div>
+        <div class="result-score" id="res-score"></div>
+      </div>
+      <div class="rbox" id="res-sit"></div>
+      <div class="rbox" id="res-act"></div>
+    </div>
+
+    <div class="recap-card">
+      <div class="recap-header">
+        <div class="recap-header-title">Fiche de typage — à conserver</div>
+        <div class="recap-date" id="recap-date"></div>
+      </div>
+      <div class="recap-body">
+        <div class="recap-row"><span class="recap-key">Bénéficiaire</span><span class="recap-val" id="rc-benef">—</span></div>
+        <div class="recap-row"><span class="recap-key">Département</span><span class="recap-val" id="rc-dept">—</span></div>
+        <div class="recap-row"><span class="recap-key">Secteur visé</span><span class="recap-val" id="rc-secteur">—</span></div>
+        <div class="recap-row"><span class="recap-key">Consultant</span><span class="recap-val" id="rc-consultant">—</span></div>
+        <div class="recap-row"><span class="recap-key">Type de typage</span><span class="recap-val" id="rc-typage">—</span></div>
+        <div class="recap-row"><span class="recap-key">Positionnement</span><span class="recap-val" id="rc-result">—</span></div>
+        <div class="recap-row"><span class="recap-key">Score</span><span class="recap-val" id="rc-score">—</span></div>
+      </div>
+      <div id="rc-notes-wrap"></div>
+    </div>
+
+    <div class="revision-block">
+      <div class="revision-title">Révisions obligatoires du typage</div>
+      <div class="chips">
+        <div class="chip">📅 J+21 — semaine 3</div>
+        <div class="chip">📅 J+45 — semaine 6</div>
+        <div class="chip">📅 J+75 — semaine 10</div>
+      </div>
+    </div>
+
+    <button class="copy-btn" id="copy-btn" onclick="copyFiche()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Copier la fiche pour le logiciel métier
+    </button>
+
+    <button class="restart-btn" onclick="restart()">
+      ↺ &nbsp;Nouveau positionnement
+    </button>
+  </div>
+
+  <footer class="app-footer">
+    ID Formation · Prestation Un Emploi Stable<br>
+    Outil interne — usage consultant uniquement
+  </footer>
+
+</div>
+<script>
+  let cur = 0;
+  const labels = ['Identification du dossier','Projet professionnel','Compétences et disponibilité','Analyse du marché','Freins à l\'emploi'];
+
+  function toggle(card) {
+    card.classList.toggle('checked');
+    card.querySelector('input').checked = card.classList.contains('checked');
+  }
+
+  function goTo(n) {
+    document.getElementById('step-' + cur).classList.remove('on');
+    cur = n;
+    document.getElementById('step-' + cur).classList.add('on');
+    document.getElementById('prog-label').textContent = labels[n];
+    document.getElementById('prog-pct').textContent = 'Étape ' + (n + 1) + ' / 5';
+    document.getElementById('prog-fill').style.width = (n / 4 * 100) + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function cc(fid, cid) {
+    document.getElementById(cid).textContent = document.getElementById(fid).value.length + ' / 400';
+  }
+
+  function showResult() {
+    let score = 0, marcheChecked = 0, freinBloquant = false;
+    document.querySelectorAll('input[type=checkbox]').forEach(c => {
+      if (c.checked) {
+        const pts = parseInt(c.dataset.pts);
+        score += pts;
+        if (c.dataset.marche) marcheChecked++;
+        if (c.dataset.frein && pts === -3) freinBloquant = true;
+      }
+    });
+    const raw = Math.max(0, score);
+    const nom = document.getElementById('f-nom').value.trim();
+    const prenom = document.getElementById('f-prenom').value.trim();
+    const dept = document.getElementById('f-dept').value.trim();
+    const secteur = document.getElementById('f-secteur').value.trim();
+    const consultant = document.getElementById('f-consultant').value.trim();
+    const typageType = document.getElementById('f-typage').value.trim();
+    const dateStr = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    document.getElementById('main-card').style.display = 'none';
+    document.getElementById('result-wrap').classList.add('on');
+    document.getElementById('prog-fill').style.width = '100%';
+    document.getElementById('prog-pct').textContent = 'Terminé';
+
+    let typeLabel = '', emoji = '', colorClass = '', sitTxt = '', actTxt = '';
+
+    if (freinBloquant) {
+      emoji = '🔴'; typeLabel = 'Non sortable'; colorClass = 'c-red';
+      sitTxt = 'Un frein périphérique bloquant est présent et non résolu. La recherche active d\'emploi ne peut pas être engagée dans ces conditions.';
+      actTxt = 'Orienter vers le partenaire compétent (service social, SIAE, mission locale, CPAM...). Réévaluer le positionnement à J+21 une fois le frein traité.';
+    } else if (marcheChecked < 2) {
+      emoji = '⚠️'; typeLabel = 'Typage incomplet'; colorClass = 'c-amber';
+      sitTxt = 'L\'analyse du marché n\'a pas été complétée. Le positionnement ne peut pas être validé sans cette étape indispensable.';
+      actTxt = 'Vérifier les offres actives sur France Travail pour le secteur et le département concernés, compléter l\'étape 4, puis recalculer.';
+    } else if (raw >= 10) {
+      emoji = '🟢'; typeLabel = 'Job Ready 100%'; colorClass = 'c-green';
+      sitTxt = 'Le profil est opérationnel et le marché est porteur. La recherche active peut démarrer immédiatement avec un rythme soutenu de candidatures ciblées.';
+      actTxt = 'Minimum 3 candidatures ciblées par semaine. Simulation d\'entretien dès la semaine 2. Objectif de placement : semaines 6 à 8. En l\'absence d\'entretien obtenu à J+30, réviser le ciblage des offres.';
+    } else if (raw >= 6) {
+      emoji = '🟡'; typeLabel = 'Job Ready 50%'; colorClass = 'c-amber';
+      sitTxt = 'Le profil présente un potentiel réel mais nécessite une phase de préparation avant l\'envoi de candidatures. Des points de blocage identifiés doivent être traités en priorité.';
+      actTxt = 'Semaines 1 à 3 : travail CV, pitch professionnel, simulation d\'entretien. Lancement des candidatures à partir de la semaine 4. Objectif de placement : semaines 9 à 11.';
+    } else {
+      emoji = '🔴'; typeLabel = 'Non sortable'; colorClass = 'c-red';
+      sitTxt = 'Le profil ne réunit pas les conditions suffisantes pour un placement dans le cadre de la prestation. Engager des candidatures dans ces conditions conduirait à des résultats prévisiblement négatifs.';
+      actTxt = 'Travailler le projet professionnel, envisager une réorientation vers un secteur plus accessible ou mobiliser les partenaires compétents. Réévaluer le positionnement à J+21.';
+    }
+
+    const boxClass = colorClass === 'c-green' ? 'box-green' : colorClass === 'c-red' ? 'box-red' : 'box-amber';
+
+    document.getElementById('res-emoji').textContent = emoji;
+    document.getElementById('res-type').textContent = typeLabel;
+    document.getElementById('res-type').className = 'result-type ' + colorClass;
+    document.getElementById('res-score').textContent = 'Score : ' + raw + ' / 14 · Marché : ' + (marcheChecked >= 2 ? 'vérifié ✓' : 'non vérifié ⚠️');
+
+    document.getElementById('res-sit').className = 'rbox ' + boxClass;
+    document.getElementById('res-sit').innerHTML = '<div class="rlbl">Situation</div><p>' + sitTxt + '</p>';
+    document.getElementById('res-act').className = 'rbox ' + boxClass;
+    document.getElementById('res-act').innerHTML = '<div class="rlbl">Plan d\'action</div><p>' + actTxt + '</p>';
+
+    document.getElementById('recap-date').textContent = dateStr;
+    document.getElementById('rc-benef').textContent = (prenom + ' ' + nom).trim() || '—';
+    document.getElementById('rc-dept').textContent = dept || '—';
+    document.getElementById('rc-secteur').textContent = secteur || '—';
+    document.getElementById('rc-consultant').textContent = consultant || '—';
+    document.getElementById('rc-typage').textContent = typageType || '—';
+    document.getElementById('rc-result').textContent = typeLabel;
+    document.getElementById('rc-score').textContent = raw + ' / 14';
+
+    const notesData = [
+      { id: 'note-projet', label: 'Projet professionnel' },
+      { id: 'note-comp', label: 'Compétences et disponibilité' },
+      { id: 'note-marche', label: 'Analyse du marché' },
+      { id: 'note-freins', label: 'Freins et plan de levée' }
+    ];
+    let notesHtml = '';
+    notesData.forEach(n => {
+      const val = document.getElementById(n.id).value.trim();
+      if (val) notesHtml += '<div class="notes-section"><div class="notes-section-label">' + n.label + '</div><div class="notes-section-content">' + val.replace(/</g, '&lt;') + '</div></div>';
+    });
+    document.getElementById('rc-notes-wrap').innerHTML = notesHtml;
+
+    // Stocker pour copie
+    let txt = '=== FICHE DE TYPAGE UES — ID FORMATION ===\n';
+    txt += 'Date : ' + dateStr + '\n';
+    txt += 'Bénéficiaire : ' + ((prenom + ' ' + nom).trim() || '—') + '\n';
+    txt += 'Département : ' + (dept || '—') + '\n';
+    txt += 'Secteur visé : ' + (secteur || '—') + '\n';
+    txt += 'Consultant : ' + (consultant || '—') + '\n';
+    txt += 'Type de typage : ' + (typageType || '—') + '\n';
+    txt += 'Positionnement : ' + typeLabel + '\n';
+    txt += 'Score : ' + raw + ' / 14\n';
+    notesData.forEach(n => {
+      const val = document.getElementById(n.id).value.trim();
+      if (val) txt += '\n--- ' + n.label + ' ---\n' + val + '\n';
+    });
+    txt += '\nRévisions obligatoires : J+21 / J+45 / J+75';
+    window._fiche = txt;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function copyFiche() {
+    if (!window._fiche) return;
+    navigator.clipboard.writeText(window._fiche).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.classList.add('copied');
+      btn.innerHTML = '✓ &nbsp;Fiche copiée — à coller dans le logiciel métier';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier la fiche pour le logiciel métier';
+      }, 3000);
+    });
+  }
+
+  function restart() {
+    document.querySelectorAll('input[type=checkbox]').forEach(c => c.checked = false);
+    document.querySelectorAll('.qcard').forEach(c => c.classList.remove('checked'));
+    document.querySelectorAll('textarea').forEach(t => t.value = '');
+    document.querySelectorAll('.char-count').forEach(c => c.textContent = '0 / 400');
+    ['f-nom','f-prenom','f-dept','f-secteur','f-consultant','f-typage'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('result-wrap').classList.remove('on');
+    document.getElementById('main-card').style.display = 'block';
+    window._fiche = null;
+    cur = 0;
+    goTo(0);
+  }
+</script>
+</body>
+</html>
